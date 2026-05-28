@@ -1,7 +1,7 @@
 package com.rzodeczko.infrastructure.kafka.outbox;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.rzodeczko.domain.model.Booking;
 import com.rzodeczko.infrastructure.kafka.avro.BookingCreatedAvro;
 import com.rzodeczko.infrastructure.kafka.properties.KafkaTopicProperties;

@@ -1,8 +1,9 @@
 package com.rzodeczko.infrastructure.configuration;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 import com.rzodeczko.application.port.in.CreateBookingUseCase;
 import com.rzodeczko.application.port.out.TravelRepository;
 import com.rzodeczko.application.service.BookingService;
@@ -23,14 +24,13 @@ import java.time.LocalDate;
 public class BeansConfiguration {
     @Bean
     public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-
         SimpleModule customDateModule = new SimpleModule();
         customDateModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
         customDateModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
-        mapper.registerModule(customDateModule);
 
-        return mapper;
+        return JsonMapper.builder()
+                .addModule(customDateModule)
+                .build();
     }
 
     @Bean

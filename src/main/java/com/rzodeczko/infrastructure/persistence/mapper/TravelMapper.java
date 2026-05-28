@@ -1,7 +1,5 @@
 package com.rzodeczko.infrastructure.persistence.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rzodeczko.domain.model.Booking;
 import com.rzodeczko.domain.model.Hotel;
 import com.rzodeczko.infrastructure.persistence.entity.BookingEntity;
@@ -9,6 +7,8 @@ import com.rzodeczko.infrastructure.persistence.entity.HotelEntity;
 import com.rzodeczko.infrastructure.persistence.entity.OutboxEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -55,7 +55,7 @@ public class TravelMapper {
                     .payload(payloadJson)
                     .createdAt(LocalDateTime.now())
                     .build();
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Error serializing Booking to JSON for Outbox", e);
         }
     }

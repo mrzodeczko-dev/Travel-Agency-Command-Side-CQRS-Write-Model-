@@ -24,3 +24,26 @@ spring:
       url: ${SPRING_DATASOURCE_URL}
       username: ${SPRING_DATASOURCE_USERNAME}
       password: ${SPRING_DATASOURCE_PASSWORD}
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    properties:
+      schema.registry.url: http://schema-registry:8200
+
+kafka:
+  topics:
+    bookings:
+      name: travel.bookings
+      partitions: 3
+      replicas: 1
+  outbox:
+    poll-interval: 1000
+    batch-size: 50
+    max-retries: 5
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include=health:
