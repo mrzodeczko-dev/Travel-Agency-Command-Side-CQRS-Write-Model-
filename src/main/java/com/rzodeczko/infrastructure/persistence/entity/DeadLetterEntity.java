@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"payload", "errorMessage"})
 public class DeadLetterEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -21,7 +22,7 @@ public class DeadLetterEntity {
     private UUID id;
 
     private UUID originalOutboxId;
-    private String aggregatedId;
+    private String aggregateId;
     private String type;
 
     @Lob

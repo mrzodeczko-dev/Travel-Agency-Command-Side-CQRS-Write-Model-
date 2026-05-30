@@ -43,7 +43,6 @@ public class OutboxScheduler {
         for (OutboxEntity entry : entries) {
             try {
                 sendToKafka(entry);
-
                 jpaOutboxRepository.delete(entry);
             } catch (Exception e) {
                 handleFailure(entry, e);
@@ -83,7 +82,7 @@ public class OutboxScheduler {
     private void moveToDeadLetter(OutboxEntity entry, Exception e) {
         var deadLetter = DeadLetterEntity.builder()
                 .originalOutboxId(entry.getId())
-                .aggregatedId(entry.getAggregateId())
+                .aggregateId(entry.getAggregateId())
                 .type(entry.getType())
                 .payload(entry.getPayload())
                 .errorMessage(e.getMessage())
@@ -98,8 +97,6 @@ public class OutboxScheduler {
         try {
             Booking booking = objectMapper.readValue(entry.getPayload(), Booking.class);
             return switch (entry.getType()) {
-
-                // UWAGA! Wygeneruj klase za pomoca "mvn compile"
                 case "BookingCreated" -> BookingCreatedAvro.newBuilder()
                         .setId(booking.id())
                         .setHotelId(booking.hotelId())
