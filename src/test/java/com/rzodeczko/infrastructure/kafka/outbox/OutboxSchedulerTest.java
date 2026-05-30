@@ -22,23 +22,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OutboxSchedulerTest {
 
-    @Mock
-    private JpaOutboxRepository jpaOutboxRepository;
-    @Mock
-    private JpaDeadLetterRepository jpaDeadLetterRepository;
-    @Mock
-    private ObjectMapper objectMapper;
-    @Mock
-    private KafkaTemplate<String, SpecificRecordBase> kafkaTemplate;
+    @Mock private JpaOutboxRepository jpaOutboxRepository;
+    @Mock private JpaDeadLetterRepository jpaDeadLetterRepository;
+    @Mock private ObjectMapper objectMapper;
+    @Mock private KafkaTemplate<String, SpecificRecordBase> kafkaTemplate;
 
     private OutboxScheduler outboxScheduler;
 
@@ -145,11 +144,32 @@ class OutboxSchedulerTest {
         verify(jpaOutboxRepository).findAllByOrderByCreatedAtAsc(PageRequest.of(0, 25));
     }
 
+    @Test
+    void processOutbox_unknownEventType_treatedAsFailureAndSavedBack() {
+        // readValue succeeds, ale switch default rzuca IllegalArgumentException
+        // która jest złapana przez toAvro i zawinięta w RuntimeException → handleFailure
+        OutboxEntity entry = buildEntryWithType(0, "UnknownEventType");
+        when(jpaOutboxRepository.findAllByOrderByCreatedAtAsc(any())).thenReturn(List.of(entry));
+        when(objectMapper.readValue(anyString(), eq(Booking.class))).thenReturn(DESERIALIZED_BOOKING);
+
+        outboxScheduler.processOutbox();
+
+        assertThat(entry.getRetryCount()).isEqualTo(1);
+        verify(jpaOutboxRepository).save(entry);
+        verify(jpaOutboxRepository, never()).delete(any());
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
     private OutboxEntity buildEntry(int retryCount) {
+        return buildEntryWithType(retryCount, "BookingCreated");
+    }
+
+    private OutboxEntity buildEntryWithType(int retryCount, String type) {
         return OutboxEntity.builder()
                 .id(UUID.randomUUID())
                 .aggregateId("1")
-                .type("BookingCreated")
+                .type(type)
                 .payload(VALID_PAYLOAD)
                 .createdAt(LocalDateTime.now())
                 .retryCount(retryCount)

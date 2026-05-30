@@ -96,20 +96,6 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.dataformat</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -135,16 +121,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--
-            Jackson 3.x (tools.jackson.databind) has a static initializer in JacksonAnnotationIntrospector
-            that references com.fasterxml.jackson.annotation.JsonSerializeAs as a backward-compat bridge.
-            That class lives in the OLD jackson-annotations 2.x jar — we only need the annotations jar,
-            not jackson-databind 2.x (our code already uses tools.jackson.* imports).
-        -->
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.18.2</version>
+            <version>2.21</version>
         </dependency>
     </dependencies>
 
@@ -160,6 +141,35 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <!-- Spring @Configuration beans — testowane tylko integracyjnie -->
+                        <exclude>**/BeansConfiguration.class</exclude>
+                        <exclude>**/SchedulingConfiguration.class</exclude>
+                        <exclude>**/AvroProducerConfig.class</exclude>
+                        <exclude>**/KafkaTopicConfig.class</exclude>
+                        <exclude>**/TravelAgencyCommandSideApplication.class</exclude>
+                        <!-- JPA repositories — interfejsy generowane przez Spring Data -->
+                        <exclude>**/repository/*.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
