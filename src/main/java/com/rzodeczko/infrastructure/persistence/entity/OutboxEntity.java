@@ -19,15 +19,12 @@ public class OutboxEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-
     private String aggregateId;
-
     private String type;
 
     @Lob
     private String payload;
     private LocalDateTime createdAt;
-
 
     @Builder.Default
     @Column(nullable = false)

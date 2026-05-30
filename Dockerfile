@@ -12,12 +12,6 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 \
     mvn clean package -DskipTests -B --no-transfer-progress -U
 
-RUN echo "=== JACKSON JARS IN FAT JAR ===" && \
-    jar tf target/app.jar | grep "BOOT-INF/lib/jackson" && \
-    echo "=== JsonSerializeAs in annotations jar ===" && \
-    (jar xf target/app.jar BOOT-INF/lib/jackson-annotations-2.18.2.jar 2>/dev/null && \
-     jar tf BOOT-INF/lib/jackson-annotations-2.18.2.jar | grep -i serializeas || echo "NOT FOUND in 2.18.2") || echo "jar extraction failed"
-
 
 RUN java -Djarmode=tools -jar target/*.jar extract --destination target/extracted
 
