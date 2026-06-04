@@ -13,6 +13,11 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 2000
+      keepalive-time: 30000
+      max-lifetime: 1800000
 
   jpa:
     hibernate:
