@@ -17,8 +17,8 @@ public class CustomLocalDateDeserializer extends StdDeserializer<LocalDate> {
     }
 
     @Override
-    public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
-        String dateStr = p.getText();
+    public LocalDate deserialize(JsonParser p, DeserializationContext ctx) throws JacksonException {
+        String dateStr = p.getString();
         return LocalDate.parse(dateStr, FORMATTER);
     }
 }

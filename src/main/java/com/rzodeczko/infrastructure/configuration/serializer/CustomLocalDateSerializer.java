@@ -1,6 +1,5 @@
 package com.rzodeczko.infrastructure.configuration.serializer;
 
-import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ser.std.StdSerializer;
@@ -17,7 +16,7 @@ public class CustomLocalDateSerializer extends StdSerializer<LocalDate> {
     }
 
     @Override
-    public void serialize(LocalDate value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
+    public void serialize(LocalDate value, JsonGenerator gen, SerializationContext ctxt) {
         gen.writeString(value.format(FORMATTER));
     }
 }
