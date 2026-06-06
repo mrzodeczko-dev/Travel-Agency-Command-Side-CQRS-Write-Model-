@@ -33,6 +33,7 @@
         <jackson.version>3.1.2</jackson.version>
         <shedlock.version>6.0.2</shedlock.version>
         <spring.retry.version>2.0.12</spring.retry.version>
+        <version.postgresql>42.7.11</version.postgresql>
     </properties>
     <repositories>
         <repository>
@@ -85,8 +86,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${version.postgresql}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

@@ -12,14 +12,20 @@ import java.time.LocalDate;
                 @Index(name = "idx_dates", columnList = "hotel_id, start_date, end_date")
         }
 )
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BookingEntity {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "booking_seq")
+    @SequenceGenerator(
+            name = "booking_seq",
+            sequenceName = "booking_seq",
+            allocationSize = 50)
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -29,9 +35,9 @@ public class BookingEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name="start_date", nullable = false)
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Column(name="end_date", nullable = false)
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 }

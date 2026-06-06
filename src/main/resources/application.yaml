@@ -24,7 +24,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           batch_size: 50
           order_inserts: true
@@ -50,13 +50,6 @@ kafka:
 sql:
   init:
     mode: always
-    data-locations:
-      - classpath:data/init.sql
-      - classpath:data/fixtures.sql
-    schema-locations: classpath:schema/schema.sql
-    encoding: UTF-8
-    continue-on-error: false  # czy kontynuować jeśli błąd
-    separator: ";"
 
 management:
   endpoints:
