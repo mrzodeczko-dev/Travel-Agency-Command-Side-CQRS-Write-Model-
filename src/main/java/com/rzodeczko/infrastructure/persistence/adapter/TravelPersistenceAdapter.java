@@ -1,8 +1,10 @@
 package com.rzodeczko.infrastructure.persistence.adapter;
 
 
-import com.rzodeczko.application.port.out.TravelRepository;
-import com.rzodeczko.domain.exception.OverbookingException;
+import com.rzodeczko.application.port.out.AvailabilityRepository;
+import com.rzodeczko.application.port.out.BookingRepository;
+import com.rzodeczko.application.port.out.HotelRepository;
+import com.rzodeczko.application.port.out.OutboxRepository;
 import com.rzodeczko.domain.model.Booking;
 import com.rzodeczko.domain.model.DailyAvailability;
 import com.rzodeczko.domain.model.Hotel;
@@ -25,7 +27,11 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class TravelPersistenceAdapter implements TravelRepository {
+public class TravelPersistenceAdapter implements
+        HotelRepository,
+        BookingRepository,
+        AvailabilityRepository,
+        OutboxRepository {
 
     private final JpaHotelRepository jpaHotelRepository;
     private final JpaBookingRepository jpaBookingRepository;

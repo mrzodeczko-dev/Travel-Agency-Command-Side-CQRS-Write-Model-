@@ -1,4 +1,4 @@
-create table if not exists shedlock (
+create table if not exists travels_db.shedlock (
     name varchar(255) not null,
     lock_until timestamp not null,
     locked_at timestamp not null default current_timestamp,

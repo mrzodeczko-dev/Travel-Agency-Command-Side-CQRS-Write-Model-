@@ -1,7 +1,10 @@
 package com.rzodeczko.application.service;
 
 import com.rzodeczko.application.command.CreateBookingCommand;
-import com.rzodeczko.application.port.out.TravelRepository;
+import com.rzodeczko.application.port.out.AvailabilityRepository;
+import com.rzodeczko.application.port.out.BookingRepository;
+import com.rzodeczko.application.port.out.HotelRepository;
+import com.rzodeczko.application.port.out.OutboxRepository;
 import com.rzodeczko.domain.exception.ResourceNotFoundException;
 import com.rzodeczko.domain.model.Booking;
 import com.rzodeczko.domain.model.Hotel;
@@ -14,7 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -22,7 +26,15 @@ import static org.mockito.Mockito.*;
 class BookingServiceTest {
 
     @Mock
-    private TravelRepository travelRepository;
+    private HotelRepository hotelRepository;
+
+    @Mock
+    private BookingRepository bookingRepository;
+    @Mock
+    private OutboxRepository outboxRepository;
+
+    @Mock
+    private AvailabilityRepository availabilityRepository;
 
     @InjectMocks
     private BookingService bookingService;
@@ -34,8 +46,8 @@ class BookingServiceTest {
     void createBooking_validCommand_returnsSavedId() {
         Hotel hotel = new Hotel(1L, 10);
         Booking saved = new Booking(42L, 1L, 7L, START, END);
-        when(travelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
-        when(travelRepository.save(any())).thenReturn(saved);
+        when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
+        when(bookingRepository.save(any())).thenReturn(saved);
 
         Long result = bookingService.createBooking(new CreateBookingCommand(1L, 7L, START, END));
 
@@ -46,41 +58,41 @@ class BookingServiceTest {
     void createBooking_validCommand_reservesAvailabilityWithHotelCapacity() {
         Hotel hotel = new Hotel(1L, 5);
         Booking saved = new Booking(1L, 1L, 7L, START, END);
-        when(travelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
-        when(travelRepository.save(any())).thenReturn(saved);
+        when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
+        when(bookingRepository.save(any())).thenReturn(saved);
 
         bookingService.createBooking(new CreateBookingCommand(1L, 7L, START, END));
 
-        verify(travelRepository).reserveAvailability(1L, 5, START, END);
+        verify(availabilityRepository).reserveAvailability(1L, 5, START, END);
     }
 
     @Test
     void createBooking_validCommand_savesBookingWithNullId() {
         Hotel hotel = new Hotel(1L, 10);
         Booking saved = new Booking(99L, 1L, 3L, START, END);
-        when(travelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
-        when(travelRepository.save(any())).thenReturn(saved);
+        when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
+        when(bookingRepository.save(any())).thenReturn(saved);
 
         bookingService.createBooking(new CreateBookingCommand(1L, 3L, START, END));
 
-        verify(travelRepository).save(new Booking(null, 1L, 3L, START, END));
+        verify(bookingRepository).save(new Booking(null, 1L, 3L, START, END));
     }
 
     @Test
     void createBooking_validCommand_savesOutboxWithSavedBooking() {
         Hotel hotel = new Hotel(1L, 10);
         Booking saved = new Booking(7L, 1L, 3L, START, END);
-        when(travelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
-        when(travelRepository.save(any())).thenReturn(saved);
+        when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
+        when(bookingRepository.save(any())).thenReturn(saved);
 
         bookingService.createBooking(new CreateBookingCommand(1L, 3L, START, END));
 
-        verify(travelRepository).saveOutbox(saved);
+        verify(outboxRepository).saveOutbox(saved);
     }
 
     @Test
     void createBooking_hotelNotFound_throwsResourceNotFoundException() {
-        when(travelRepository.findHotel(99L)).thenReturn(Optional.empty());
+        when(hotelRepository.findHotel(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookingService.createBooking(new CreateBookingCommand(99L, 7L, START, END)))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -89,13 +101,13 @@ class BookingServiceTest {
 
     @Test
     void createBooking_hotelNotFound_neverSavesBookingOrOutbox() {
-        when(travelRepository.findHotel(99L)).thenReturn(Optional.empty());
+        when(hotelRepository.findHotel(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookingService.createBooking(new CreateBookingCommand(99L, 7L, START, END)))
                 .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(travelRepository, never()).save(any());
-        verify(travelRepository, never()).saveOutbox(any());
+        verify(bookingRepository, never()).save(any());
+        verify(outboxRepository, never()).saveOutbox(any());
     }
 
     @Test
@@ -110,6 +122,8 @@ class BookingServiceTest {
         assertThatThrownBy(() -> bookingService.createBooking(new CreateBookingCommand(1L, 7L, END, START)))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        verifyNoInteractions(travelRepository);
+        verifyNoInteractions(hotelRepository);
+        verifyNoInteractions(bookingRepository);
+        verifyNoInteractions(outboxRepository);
     }
 }
