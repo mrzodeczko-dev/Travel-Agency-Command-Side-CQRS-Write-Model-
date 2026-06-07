@@ -25,10 +25,8 @@ public class DeadLetterEntity {
     private String aggregateId;
     private String type;
 
-    @Lob
     private String payload;
 
-    @Lob
     private String errorMessage;
 
     private LocalDateTime createdAt;

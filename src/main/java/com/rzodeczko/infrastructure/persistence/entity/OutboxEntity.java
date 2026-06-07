@@ -22,7 +22,7 @@ public class OutboxEntity {
     private String aggregateId;
     private String type;
 
-    @Lob
+
     private String payload;
     private LocalDateTime createdAt;
 

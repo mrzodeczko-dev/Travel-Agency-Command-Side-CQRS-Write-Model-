@@ -81,11 +81,11 @@ public class OutboxScheduler {
             moveToDeadLetter(entry, e);
             jpaOutboxRepository.delete(entry);
             log.error("Outbox entry {} moved to DLT after {} retries: {}",
-                    entry.getId(), outboxProperties.maxRetries(), e.getMessage());
+                    entry.getId(), outboxProperties.maxRetries(), e.getMessage(), e);
         } else {
             jpaOutboxRepository.save(entry);
             log.warn("Outbox entry {} failed (attempt {}/{}): {}",
-                    entry.getId(), entry.getRetryCount(), outboxProperties.maxRetries(), e.getMessage());
+                    entry.getId(), entry.getRetryCount(), outboxProperties.maxRetries(), e.getMessage(), e);
         }
     }
 
