@@ -1,11 +1,9 @@
 package com.rzodeczko.infrastructure.kafka.outbox;
 
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import tools.jackson.databind.ObjectMapper;
+import com.rzodeczko.avro.BookingEventAvro;
+import com.rzodeczko.avro.EventType;
 import com.rzodeczko.domain.model.Booking;
-import com.rzodeczko.infrastructure.kafka.avro.BookingEventAvro;
-import com.rzodeczko.infrastructure.kafka.avro.EventType;
 import com.rzodeczko.infrastructure.kafka.properties.KafkaTopicProperties;
 import com.rzodeczko.infrastructure.kafka.properties.OutboxProperties;
 import com.rzodeczko.infrastructure.persistence.entity.DeadLetterEntity;
@@ -14,12 +12,14 @@ import com.rzodeczko.infrastructure.persistence.repository.JpaDeadLetterReposito
 import com.rzodeczko.infrastructure.persistence.repository.JpaOutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
