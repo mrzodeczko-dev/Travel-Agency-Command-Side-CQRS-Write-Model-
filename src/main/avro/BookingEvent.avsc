@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "BookingEventAvro",
-  "namespace": "com.rzodeczko.infrastructure.kafka.avro",
+  "namespace": "com.rzodeczko.avro",
   "fields": [
     {
       "name": "eventType",
