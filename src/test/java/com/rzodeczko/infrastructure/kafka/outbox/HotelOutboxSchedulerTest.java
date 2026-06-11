@@ -137,8 +137,6 @@ class HotelOutboxSchedulerTest {
         assertThat(scheduler.supportedTypes()).containsExactly("HotelUpserted");
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
-
     private OutboxEntity buildEntry(int retryCount) {
         return OutboxEntity.builder()
                 .id(UUID.randomUUID())
