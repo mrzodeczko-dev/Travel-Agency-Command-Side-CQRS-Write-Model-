@@ -13,7 +13,11 @@ import lombok.*;
 public class HotelEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_seq")
+    @SequenceGenerator(
+            name = "hotel_seq",
+            sequenceName = "hotel_seq",
+            allocationSize = 1)
     @EqualsAndHashCode.Include
     private Long id;
 
