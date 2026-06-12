@@ -203,6 +203,7 @@ KAFKA_HEAP_OPTS=-Xmx512M -Xms512M
 
 # ─── Topics ──────────────────────────────────────────────────────────────────
 TOPIC_BOOKINGS=travel.bookings
+TOPIC_HOTELS=travel.hotels
 TOPIC_PARTITIONS=3
 TOPIC_REPLICAS=1
 ```
@@ -252,6 +253,7 @@ Verify: `curl http://localhost:8080/actuator/health` → `{"status":"UP"}`
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
 | `TOPIC_BOOKINGS` | yes | Kafka topic for booking events | `travel.bookings` |
+| `TOPIC_HOTELS` | yes | Kafka topic for hotel events | `travel.hotels` |
 | `TOPIC_PARTITIONS` | optional | Number of partitions for topic creation | `3` |
 | `TOPIC_REPLICAS` | optional | Replication factor for topic creation | `1` |
 

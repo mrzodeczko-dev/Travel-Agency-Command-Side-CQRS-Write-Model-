@@ -94,6 +94,7 @@ services:
     entrypoint: [ "bash", "-c", "
       echo 'Creating Kafka topics...' &&
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic ${TOPIC_BOOKINGS} --partitions ${TOPIC_PARTITIONS:-3} --replication-factor ${TOPIC_REPLICAS:-1} &&
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic ${TOPIC_HOTELS} --partitions ${TOPIC_PARTITIONS:-3} --replication-factor ${TOPIC_REPLICAS:-1} &&
       echo 'All topics created successfully'
       " ]
     restart: "no"
@@ -145,6 +146,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${TA_COMMAND_SIDE_SERVICE_DB_PASSWORD}
       SERVER_PORT: ${TA_COMMAND_SIDE_SERVICE_PORT}
       TOPIC_BOOKINGS: ${TOPIC_BOOKINGS}
+      TOPIC_HOTELS: ${TOPIC_HOTELS}
       SPRINGDOC_ENABLED: ${SPRINGDOC_ENABLED}
     deploy:
         resources:

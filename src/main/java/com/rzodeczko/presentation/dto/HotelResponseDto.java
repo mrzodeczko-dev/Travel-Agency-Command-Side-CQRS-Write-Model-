@@ -1,4 +1,4 @@
 package com.rzodeczko.presentation.dto;
 
-public record HotelResponseDto(Long hotelId, int capacity) {
+public record HotelResponseDto(Long hotelId, Long capacity) {
 }

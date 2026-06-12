@@ -119,7 +119,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE))
                 .thenReturn(List.of());
 
-        adapter.reserveAvailability(1L, 5, DATE, DATE);
+        adapter.reserveAvailability(1L, 5L, DATE, DATE);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<DailyAvailabilityEntity>> captor = ArgumentCaptor.forClass(List.class);
@@ -139,7 +139,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE))
                 .thenReturn(List.of(existing));
 
-        adapter.reserveAvailability(1L, 5, DATE, DATE);
+        adapter.reserveAvailability(1L, 5L, DATE, DATE);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<DailyAvailabilityEntity>> captor = ArgumentCaptor.forClass(List.class);
@@ -154,7 +154,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE))
                 .thenReturn(List.of(full));
 
-        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 5, DATE, DATE))
+        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 5L, DATE, DATE))
                 .isInstanceOf(OverbookingException.class)
                 .hasMessageContaining("Hotel 1 overbooked on " + DATE);
     }
@@ -165,7 +165,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE_END))
                 .thenReturn(List.of());
 
-        adapter.reserveAvailability(1L, 10, DATE, DATE_END);
+        adapter.reserveAvailability(1L, 10L, DATE, DATE_END);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<DailyAvailabilityEntity>> captor = ArgumentCaptor.forClass(List.class);
@@ -183,7 +183,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, day1, day2))
                 .thenReturn(List.of(fullDay2));
 
-        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 5, day1, day2))
+        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 5L, day1, day2))
                 .isInstanceOf(OverbookingException.class)
                 .hasMessageContaining("overbooked on " + day2);
 
@@ -197,7 +197,7 @@ class TravelPersistenceAdapterTest {
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE_END))
                 .thenReturn(List.of(full));
 
-        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 2, DATE, DATE_END))
+        assertThatThrownBy(() -> adapter.reserveAvailability(1L, 2L, DATE, DATE_END))
                 .isInstanceOf(OverbookingException.class);
 
         verify(jpaDailyAvailabilityRepository, never()).saveAll(any());

@@ -8,13 +8,16 @@ import com.rzodeczko.application.port.in.CreateBookingUseCase;
 import com.rzodeczko.presentation.dto.CreateBookingRequestDto;
 import com.rzodeczko.presentation.dto.CreateBookingResponseDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/bookings")
+@Validated
 public class BookingController {
     private final CreateBookingUseCase createBookingUseCase;
     private final CancelBookingUseCase cancelBookingUseCase;
@@ -43,7 +46,10 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> cancel(@PathVariable Long id) {
+    public ResponseEntity<Void> cancel(
+            @PathVariable
+            @Positive(message = "Booking ID must be a positive number")
+            Long id) {
         cancelBookingUseCase.cancelBooking(new CancelBookingCommand(id));
         return ResponseEntity.noContent().build();
     }

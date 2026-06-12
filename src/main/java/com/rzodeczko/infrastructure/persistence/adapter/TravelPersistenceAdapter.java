@@ -8,8 +8,8 @@ import com.rzodeczko.application.port.out.OutboxRepository;
 import com.rzodeczko.domain.model.Booking;
 import com.rzodeczko.domain.model.DailyAvailability;
 import com.rzodeczko.domain.model.Hotel;
-import com.rzodeczko.infrastructure.persistence.entity.HotelEntity;
 import com.rzodeczko.infrastructure.persistence.entity.DailyAvailabilityEntity;
+import com.rzodeczko.infrastructure.persistence.entity.HotelEntity;
 import com.rzodeczko.infrastructure.persistence.mapper.TravelMapper;
 import com.rzodeczko.infrastructure.persistence.repository.JpaBookingRepository;
 import com.rzodeczko.infrastructure.persistence.repository.JpaDailyAvailabilityRepository;
@@ -87,7 +87,7 @@ public class TravelPersistenceAdapter implements
 
 
     @Override
-    public void reserveAvailability(Long hotelId, int capacity, LocalDate start, LocalDate end) {
+    public void reserveAvailability(Long hotelId, Long capacity, LocalDate start, LocalDate end) {
 
         Map<LocalDate, DailyAvailabilityEntity> existingSlots = jpaDailyAvailabilityRepository
                 .findAndLockByHotelAndDateRange(hotelId, start, end)
@@ -121,7 +121,7 @@ public class TravelPersistenceAdapter implements
             Map<LocalDate, DailyAvailabilityEntity> existingSlots,
             Long hotelId,
             LocalDate date,
-            int capacity
+            Long capacity
     ) {
 
         DailyAvailabilityEntity existing = existingSlots.get(date);

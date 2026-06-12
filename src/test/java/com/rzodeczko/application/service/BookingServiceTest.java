@@ -44,7 +44,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_validCommand_returnsSavedId() {
-        Hotel hotel = new Hotel(1L, 10);
+        Hotel hotel = new Hotel(1L, 10L);
         Booking saved = new Booking(42L, 1L, 7L, START, END);
         when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
         when(bookingRepository.save(any())).thenReturn(saved);
@@ -63,12 +63,12 @@ class BookingServiceTest {
 
         bookingService.createBooking(new CreateBookingCommand(1L, 7L, START, END));
 
-        verify(availabilityRepository).reserveAvailability(1L, 5, START, END);
+        verify(availabilityRepository).reserveAvailability(1L, 5L, START, END);
     }
 
     @Test
     void createBooking_validCommand_savesBookingWithNullId() {
-        Hotel hotel = new Hotel(1L, 10);
+        Hotel hotel = new Hotel(1L, 10L);
         Booking saved = new Booking(99L, 1L, 3L, START, END);
         when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
         when(bookingRepository.save(any())).thenReturn(saved);

@@ -19,7 +19,7 @@ public class DailyAvailability {
         return occupiedRooms;
     }
 
-    public void reserveOne(int capacity) {
+    public void reserveOne(Long capacity) {
         if(occupiedRooms >= capacity) {
             throw new OverbookingException("Hotel %d overbooked on %s. Capacity: %d, occupied: %d "
                     .formatted(hotelId, date, capacity, occupiedRooms));

@@ -1,6 +1,6 @@
 package com.rzodeczko.infrastructure.tx;
 
-import com.rzodeczko.application.command.UpsertHotelCommand;
+import com.rzodeczko.application.event.HotelUpsertedPayload;
 import com.rzodeczko.application.port.in.UpsertHotelUseCase;
 import com.rzodeczko.domain.model.Hotel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class TransactionalUpsertHotelUseCase implements UpsertHotelUseCase {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Hotel upsertHotel(UpsertHotelCommand command) {
+    public Hotel upsertHotel(HotelUpsertedPayload command) {
         return delegate.upsertHotel(command);
     }
 }

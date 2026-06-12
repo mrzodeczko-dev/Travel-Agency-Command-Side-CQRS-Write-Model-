@@ -1,6 +1,6 @@
 package com.rzodeczko.application.service;
 
-import com.rzodeczko.application.command.UpsertHotelCommand;
+import com.rzodeczko.application.event.HotelUpsertedPayload;
 import com.rzodeczko.application.port.in.UpsertHotelUseCase;
 import com.rzodeczko.application.port.out.HotelRepository;
 import com.rzodeczko.application.port.out.OutboxRepository;
@@ -17,7 +17,7 @@ public class HotelService implements UpsertHotelUseCase {
     }
 
     @Override
-    public Hotel upsertHotel(UpsertHotelCommand command) {
+    public Hotel upsertHotel(HotelUpsertedPayload command) {
         if (command.capacity() <= 0) {
             throw new IllegalArgumentException("Capacity must be positive");
         }

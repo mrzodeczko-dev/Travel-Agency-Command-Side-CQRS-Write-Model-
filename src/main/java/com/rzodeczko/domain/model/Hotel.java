@@ -2,9 +2,9 @@ package com.rzodeczko.domain.model;
 
 public class Hotel {
     private final Long id;
-    private final int capacity;
+    private final Long capacity;
 
-    public Hotel(Long id, int capacity) {
+    public Hotel(Long id, Long capacity) {
         this.id = id;
         this.capacity = capacity;
     }
@@ -13,7 +13,7 @@ public class Hotel {
         return id;
     }
 
-    public int getCapacity() {
+    public Long getCapacity() {
         return capacity;
     }
 }
