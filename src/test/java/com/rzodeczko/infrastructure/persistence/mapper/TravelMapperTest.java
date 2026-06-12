@@ -25,15 +25,19 @@ import static org.mockito.Mockito.when;
 class TravelMapperTest {
 
     private static final LocalDate START = LocalDate.of(2027, 6, 1);
-    private static final LocalDate END   = LocalDate.of(2027, 6, 7);
+    private static final LocalDate END = LocalDate.of(2027, 6, 7);
 
     @Mock
     private ObjectMapper mockObjectMapper;
 
-    /** Mapper z prawdziwym JsonMapper — do happy-path testów */
+    /**
+     * Mapper z prawdziwym JsonMapper — do happy-path testów
+     */
     private TravelMapper mapper;
 
-    /** Mapper z mockiem ObjectMapper — do testowania ścieżki błędu */
+    /**
+     * Mapper z mockiem ObjectMapper — do testowania ścieżki błędu
+     */
     private TravelMapper failingMapper;
 
     @BeforeEach
@@ -42,11 +46,10 @@ class TravelMapperTest {
         failingMapper = new TravelMapper(mockObjectMapper);
     }
 
-    // ── toHotelDomain ────────────────────────────────────────────────────────
 
     @Test
     void toHotelDomain_mapsIdAndCapacity() {
-        HotelEntity entity = HotelEntity.builder().id(1L).capacity(5).build();
+        HotelEntity entity = HotelEntity.builder().id(1L).capacity(5L).build();
 
         Hotel hotel = mapper.toHotelDomain(entity);
 
@@ -54,7 +57,6 @@ class TravelMapperTest {
         assertThat(hotel.getCapacity()).isEqualTo(5);
     }
 
-    // ── toBookingDomain ──────────────────────────────────────────────────────
 
     @Test
     void toBookingDomain_mapsAllFields() {
@@ -69,7 +71,6 @@ class TravelMapperTest {
         assertThat(booking.end()).isEqualTo(END);
     }
 
-    // ── toBookingEntity ──────────────────────────────────────────────────────
 
     @Test
     void toBookingEntity_mapsAllFields() {
@@ -93,7 +94,6 @@ class TravelMapperTest {
         assertThat(entity.getId()).isNull();
     }
 
-    // ── toOutboxEntity ───────────────────────────────────────────────────────
 
     @Test
     void toOutboxEntity_setsAggregateIdFromHotelId() {
@@ -135,9 +135,9 @@ class TravelMapperTest {
 
     @Test
     void toOutboxEntity_serializationFailure_throwsRuntimeException() {
-        // JacksonException jest abstrakcyjna — tworzymy anonimową podklasę
         when(mockObjectMapper.writeValueAsString(any()))
-                .thenThrow(new JacksonException("forced failure") {});
+                .thenThrow(new JacksonException("forced failure") {
+                });
 
         Booking booking = new Booking(1L, 1L, 2L, START, END);
 

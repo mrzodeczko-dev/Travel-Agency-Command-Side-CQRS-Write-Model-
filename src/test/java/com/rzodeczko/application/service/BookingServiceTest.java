@@ -56,7 +56,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_validCommand_reservesAvailabilityWithHotelCapacity() {
-        Hotel hotel = new Hotel(1L, 5);
+        Hotel hotel = new Hotel(1L, 5L);
         Booking saved = new Booking(1L, 1L, 7L, START, END);
         when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
         when(bookingRepository.save(any())).thenReturn(saved);
@@ -80,7 +80,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_validCommand_savesOutboxWithSavedBooking() {
-        Hotel hotel = new Hotel(1L, 10);
+        Hotel hotel = new Hotel(1L, 10L);
         Booking saved = new Booking(7L, 1L, 3L, START, END);
         when(hotelRepository.findHotel(1L)).thenReturn(Optional.of(hotel));
         when(bookingRepository.save(any())).thenReturn(saved);

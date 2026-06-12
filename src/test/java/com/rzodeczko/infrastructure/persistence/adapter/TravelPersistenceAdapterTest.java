@@ -2,6 +2,7 @@ package com.rzodeczko.infrastructure.persistence.adapter;
 
 import com.rzodeczko.domain.exception.OverbookingException;
 import com.rzodeczko.domain.model.Booking;
+import com.rzodeczko.domain.model.DailyAvailability;
 import com.rzodeczko.domain.model.Hotel;
 import com.rzodeczko.infrastructure.persistence.entity.BookingEntity;
 import com.rzodeczko.infrastructure.persistence.entity.DailyAvailabilityEntity;
@@ -12,7 +13,6 @@ import com.rzodeczko.infrastructure.persistence.repository.JpaBookingRepository;
 import com.rzodeczko.infrastructure.persistence.repository.JpaDailyAvailabilityRepository;
 import com.rzodeczko.infrastructure.persistence.repository.JpaHotelRepository;
 import com.rzodeczko.infrastructure.persistence.repository.JpaOutboxRepository;
-import com.rzodeczko.domain.model.DailyAvailability;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,16 +33,21 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TravelPersistenceAdapterTest {
 
-    @Mock private JpaHotelRepository jpaHotelRepository;
-    @Mock private JpaBookingRepository jpaBookingRepository;
-    @Mock private JpaOutboxRepository jpaOutboxRepository;
-    @Mock private TravelMapper travelMapper;
-    @Mock private JpaDailyAvailabilityRepository jpaDailyAvailabilityRepository;
+    @Mock
+    private JpaHotelRepository jpaHotelRepository;
+    @Mock
+    private JpaBookingRepository jpaBookingRepository;
+    @Mock
+    private JpaOutboxRepository jpaOutboxRepository;
+    @Mock
+    private TravelMapper travelMapper;
+    @Mock
+    private JpaDailyAvailabilityRepository jpaDailyAvailabilityRepository;
 
     @InjectMocks
     private TravelPersistenceAdapter adapter;
 
-    private static final LocalDate DATE     = LocalDate.of(2027, 6, 1);
+    private static final LocalDate DATE = LocalDate.of(2027, 6, 1);
     private static final LocalDate DATE_END = LocalDate.of(2027, 6, 3);
 
     @BeforeEach
@@ -58,12 +63,11 @@ class TravelPersistenceAdapterTest {
         });
     }
 
-    // ── findHotel ────────────────────────────────────────────────────────────
 
     @Test
     void findHotel_found_returnsMappedDomain() {
-        HotelEntity entity = HotelEntity.builder().id(1L).capacity(10).build();
-        Hotel domain = new Hotel(1L, 10);
+        HotelEntity entity = HotelEntity.builder().id(1L).capacity(10L).build();
+        Hotel domain = new Hotel(1L, 10L);
         when(jpaHotelRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(travelMapper.toHotelDomain(entity)).thenReturn(domain);
 
@@ -81,14 +85,13 @@ class TravelPersistenceAdapterTest {
         assertThat(result).isEmpty();
     }
 
-    // ── save ─────────────────────────────────────────────────────────────────
 
     @Test
     void save_delegatesToMapperAndRepo_returnsMappedDomain() {
-        Booking input   = new Booking(null, 1L, 2L, DATE, DATE_END);
-        BookingEntity entity  = BookingEntity.builder().hotelId(1L).userId(2L).startDate(DATE).endDate(DATE_END).build();
-        BookingEntity saved   = BookingEntity.builder().id(7L).hotelId(1L).userId(2L).startDate(DATE).endDate(DATE_END).build();
-        Booking expected      = new Booking(7L, 1L, 2L, DATE, DATE_END);
+        Booking input = new Booking(null, 1L, 2L, DATE, DATE_END);
+        BookingEntity entity = BookingEntity.builder().hotelId(1L).userId(2L).startDate(DATE).endDate(DATE_END).build();
+        BookingEntity saved = BookingEntity.builder().id(7L).hotelId(1L).userId(2L).startDate(DATE).endDate(DATE_END).build();
+        Booking expected = new Booking(7L, 1L, 2L, DATE, DATE_END);
 
         when(travelMapper.toBookingEntity(input)).thenReturn(entity);
         when(jpaBookingRepository.save(entity)).thenReturn(saved);
@@ -99,7 +102,6 @@ class TravelPersistenceAdapterTest {
         assertThat(result).isEqualTo(expected);
     }
 
-    // ── saveOutbox ───────────────────────────────────────────────────────────
 
     @Test
     void saveOutbox_delegatesToMapperAndRepo() {
@@ -112,7 +114,6 @@ class TravelPersistenceAdapterTest {
         verify(jpaOutboxRepository).save(outbox);
     }
 
-    // ── reserveAvailability — new slots ──────────────────────────────────────
 
     @Test
     void reserveAvailability_noExistingSlot_createsNewSlotWithOccupiedRoomsOne() {
@@ -161,7 +162,6 @@ class TravelPersistenceAdapterTest {
 
     @Test
     void reserveAvailability_multiDateRange_savesAllDates() {
-        // DATE..DATE_END = 3 nights: 1, 2, 3 June
         when(jpaDailyAvailabilityRepository.findAndLockByHotelAndDateRange(1L, DATE, DATE_END))
                 .thenReturn(List.of());
 

@@ -8,7 +8,7 @@ class HotelTest {
 
     @Test
     void constructor_setsIdAndCapacity() {
-        Hotel hotel = new Hotel(42L, 10);
+        Hotel hotel = new Hotel(42L, 10L);
 
         assertThat(hotel.getId()).isEqualTo(42L);
         assertThat(hotel.getCapacity()).isEqualTo(10);
@@ -16,7 +16,7 @@ class HotelTest {
 
     @Test
     void constructor_zeroCapacity_allowed() {
-        Hotel hotel = new Hotel(1L, 0);
+        Hotel hotel = new Hotel(1L, 0L);
 
         assertThat(hotel.getCapacity()).isZero();
     }
