@@ -6,9 +6,16 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record CreateBookingRequestDto(
-        @NotNull Long hotelId,
-        @NotNull Long userId,
-        @NotNull @FutureOrPresent LocalDate start,
-        @NotNull @FutureOrPresent LocalDate end
+        @NotNull(message = "Hotel ID is required") Long hotelId,
+
+        @NotNull(message = "User ID is required") Long userId,
+
+        @NotNull(message = "Start date is required")
+        @FutureOrPresent(message = "Start date must be today or in the future")
+        LocalDate start,
+
+        @NotNull(message = "End date is required")
+        @FutureOrPresent(message = "End date must be today or in the future")
+        LocalDate end
 ) {
 }

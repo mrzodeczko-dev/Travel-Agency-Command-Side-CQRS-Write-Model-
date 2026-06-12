@@ -3,9 +3,9 @@ package com.rzodeczko.presentation.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record UpsertHotelRequestDto(
+public record CreateHotelRequestDto(
         @NotNull(message = "Capacity is required")
-        @Positive(message = "Capacity must me positive number")
+        @Positive(message = "Capacity must be a positive number")
         Long capacity
 ) {
 }

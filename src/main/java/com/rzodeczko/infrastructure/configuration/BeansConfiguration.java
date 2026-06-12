@@ -7,7 +7,8 @@ import com.rzodeczko.application.port.out.AvailabilityRepository;
 import com.rzodeczko.application.port.out.BookingRepository;
 import com.rzodeczko.application.port.out.HotelRepository;
 import com.rzodeczko.application.port.out.OutboxRepository;
-import com.rzodeczko.application.port.in.UpsertHotelUseCase;
+import com.rzodeczko.application.port.in.CreateHotelUseCase;
+import com.rzodeczko.application.port.in.UpdateHotelCapacityUseCase;
 import com.rzodeczko.application.service.BookingService;
 import com.rzodeczko.application.service.HotelService;
 import com.rzodeczko.infrastructure.configuration.serializer.CustomLocalDateDeserializer;
@@ -19,7 +20,8 @@ import com.rzodeczko.infrastructure.tx.RetryingCancelBookingUseCase;
 import com.rzodeczko.infrastructure.tx.RetryingCreateBookingUseCase;
 import com.rzodeczko.infrastructure.tx.TransactionalCancelBookingUseCase;
 import com.rzodeczko.infrastructure.tx.TransactionalCreateBookingUseCase;
-import com.rzodeczko.infrastructure.tx.TransactionalUpsertHotelUseCase;
+import com.rzodeczko.infrastructure.tx.TransactionalCreateHotelUseCase;
+import com.rzodeczko.infrastructure.tx.TransactionalUpdateHotelCapacityUseCase;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -64,8 +66,13 @@ public class BeansConfiguration {
     }
 
     @Bean
-    public UpsertHotelUseCase upsertHotelUseCase(HotelService hotelService) {
-        return new TransactionalUpsertHotelUseCase(hotelService);
+    public CreateHotelUseCase createHotelUseCase(HotelService hotelService) {
+        return new TransactionalCreateHotelUseCase(hotelService);
+    }
+
+    @Bean
+    public UpdateHotelCapacityUseCase updateHotelCapacityUseCase(HotelService hotelService) {
+        return new TransactionalUpdateHotelCapacityUseCase(hotelService);
     }
 
     @Bean
