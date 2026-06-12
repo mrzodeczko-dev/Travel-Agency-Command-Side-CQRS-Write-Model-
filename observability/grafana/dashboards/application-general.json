@@ -377,6 +377,6 @@
     ]
   },
   "time": { "from": "now-1h", "to": "now" },
-  "title": "Travel Agency — Spring Boot Overview",
-  "uid": "spring-boot-overview"
+  "title": "Travel Agency - application general",
+  "uid": "application general"
 }

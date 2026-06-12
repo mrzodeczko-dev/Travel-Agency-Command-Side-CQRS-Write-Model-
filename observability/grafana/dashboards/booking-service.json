@@ -6,12 +6,12 @@
   "links": [],
   "panels": [
     {
-      "title": "Hotels Created (rate)",
+      "title": "Bookings Created (rate)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "targets": [
         {
-          "expr": "rate(hotels_total[1m])",
+          "expr": "rate(bookings_total[1m])",
           "legendFormat": "created/min",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
@@ -26,13 +26,13 @@
       }
     },
     {
-      "title": "Hotel Capacity Updates (rate)",
+      "title": "Bookings Cancelled (rate)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "targets": [
         {
-          "expr": "rate(hotels_capacity_updated_total[1m])",
-          "legendFormat": "updates/min",
+          "expr": "rate(bookings_cancelled_total[1m])",
+          "legendFormat": "cancelled/min",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
       ],
@@ -46,50 +46,37 @@
       }
     },
     {
-      "title": "Hotel Failures",
+      "title": "Booking Failures",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "targets": [
         {
-          "expr": "rate(hotels_create_failed_total[1m])",
-          "legendFormat": "create failures/min",
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
-        },
-        {
-          "expr": "rate(hotels_update_failed_total[1m])",
-          "legendFormat": "update failures/min",
+          "expr": "rate(bookings_failed_total[1m])",
+          "legendFormat": "failures/min",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "ops",
+          "color": { "mode": "fixed", "fixedColor": "red" },
           "custom": { "drawStyle": "line", "fillOpacity": 15, "spanNulls": true }
         },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "create failures/min" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "update failures/min" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
-          }
-        ]
+        "overrides": []
       }
     },
     {
-      "title": "Hotel Create Latency (avg / max)",
+      "title": "Booking Create Latency (avg / max)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "targets": [
         {
-          "expr": "rate(hotels_create_duration_seconds_sum[5m]) / rate(hotels_create_duration_seconds_count[5m])",
+          "expr": "rate(bookings_create_duration_seconds_sum[5m]) / rate(bookings_create_duration_seconds_count[5m])",
           "legendFormat": "avg",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         },
         {
-          "expr": "hotels_create_duration_seconds_max",
+          "expr": "bookings_create_duration_seconds_max",
           "legendFormat": "max",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
@@ -103,17 +90,17 @@
       }
     },
     {
-      "title": "Hotel Update Latency (avg / max)",
+      "title": "Booking Cancel Latency (avg / max)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "targets": [
         {
-          "expr": "rate(hotels_update_duration_seconds_sum[5m]) / rate(hotels_update_duration_seconds_count[5m])",
+          "expr": "rate(bookings_cancel_duration_seconds_sum[5m]) / rate(bookings_cancel_duration_seconds_count[5m])",
           "legendFormat": "avg",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         },
         {
-          "expr": "hotels_update_duration_seconds_max",
+          "expr": "bookings_cancel_duration_seconds_max",
           "legendFormat": "max",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
@@ -127,18 +114,18 @@
       }
     },
     {
-      "title": "Hotels — Totals",
+      "title": "Bookings — Totals",
       "type": "stat",
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 16 },
       "targets": [
         {
-          "expr": "hotels_total",
+          "expr": "bookings_total",
           "legendFormat": "created",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         },
         {
-          "expr": "hotels_capacity_updated_total",
-          "legendFormat": "updated",
+          "expr": "bookings_cancelled_total",
+          "legendFormat": "cancelled",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
       ],
@@ -152,18 +139,13 @@
       }
     },
     {
-      "title": "Hotels — Failure Totals",
+      "title": "Bookings — Failure Totals",
       "type": "stat",
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 16 },
       "targets": [
         {
-          "expr": "hotels_create_failed_total",
-          "legendFormat": "create failed",
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
-        },
-        {
-          "expr": "hotels_update_failed_total",
-          "legendFormat": "update failed",
+          "expr": "bookings_failed_total",
+          "legendFormat": "failed",
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }
         }
       ],
@@ -181,7 +163,7 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["travel-agency", "hotels"],
+  "tags": ["travel-agency", "bookings"],
   "templating": {
     "list": [
       {
@@ -194,6 +176,6 @@
     ]
   },
   "time": { "from": "now-1h", "to": "now" },
-  "title": "Travel Agency Command side - Hotels Service",
-  "uid": "hotels-service"
+  "title": "Travel Agency Command side - Booking Service",
+  "uid": "booking-service"
 }
