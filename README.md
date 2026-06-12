@@ -1,4 +1,4 @@
-# ✈️ Travel Agency — Command Side (CQRS Write Model)
+# ✈️ Travel Agency  -  Command Side (CQRS Write Model)
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://openjdk.org/)
@@ -15,7 +15,7 @@
 ## 📖 Overview
 [Back to Table of Contents](#toc)
 
-Travel Agency Command Side is the write model of a CQRS-based hotel booking platform. It handles booking **creation** and **cancellation** commands — enforcing availability via **Pessimistic Locking** on a per-day availability table, and publishing events to Kafka via the **Transactional Outbox Pattern**. A single `BookingEventAvro` schema with an `EventType` enum (`BookingCreated` / `BookingCancelled`) is used for all booking events. Built on Hexagonal Architecture with a clean separation between domain, application, and infrastructure layers.
+Travel Agency Command Side is the write model of a CQRS-based hotel booking platform. It handles booking **creation** and **cancellation** commands  -  enforcing availability via **Pessimistic Locking** on a per-day availability table, and publishing events to Kafka via the **Transactional Outbox Pattern**. A single `BookingEventAvro` schema with an `EventType` enum (`BookingCreated` / `BookingCancelled`) is used for all booking events. Built on Hexagonal Architecture with a clean separation between domain, application, and infrastructure layers.
 
 <a id="toc"></a>
 ## 📚 Table of Contents
@@ -42,10 +42,10 @@ Travel Agency Command Side is the write model of a CQRS-based hotel booking plat
 
 1. Client sends `POST /api/bookings` with hotel ID, user ID, and desired dates
 2. `BookingController` maps the request to a `CreateBookingCommand` and delegates to `CreateBookingUseCase`
-3. `RetryingCreateBookingUseCase` wraps the call with Spring Retry — up to 3 attempts with 50 ms backoff on `DataIntegrityViolationException`
+3. `RetryingCreateBookingUseCase` wraps the call with Spring Retry  -  up to 3 attempts with 50 ms backoff on `DataIntegrityViolationException`
 4. `TransactionalCreateBookingUseCase` wraps the operation in a single DB transaction (`READ_COMMITTED`)
 5. `BookingService` fetches the `Hotel` aggregate and calls `reserveAvailability` on the repository port
-6. `TravelPersistenceAdapter` runs `SELECT ... FOR UPDATE` (pessimistic write lock) on all rows in `daily_availabilities` matching the hotel and date range — with a 3 s lock timeout
+6. `TravelPersistenceAdapter` runs `SELECT ... FOR UPDATE` (pessimistic write lock) on all rows in `daily_availabilities` matching the hotel and date range  -  with a 3 s lock timeout
 7. For each date in the range: if a row exists it is checked against capacity and incremented; if no row exists it is created at `occupiedRooms = 1`. `OverbookingException` is thrown on any date that is full
 8. The new `Booking` (status `ACTIVE`) is persisted and an `OutboxEntity` record (type `BookingCreated`) is saved **in the same transaction** (Transactional Outbox Pattern)
 
@@ -113,15 +113,15 @@ sequenceDiagram
 | Method | Path | Purpose | Request Body | Success | Common Errors |
 |--------|------|---------|--------------|---------|---------------|
 | `POST` | `/api/bookings` | Create a new booking | `CreateBookingRequestDto` | `201 Created` | `400`, `409` |
-| `DELETE` | `/api/bookings/{id}` | Cancel a booking | — | `204 No Content` | `404`, `409` |
+| `DELETE` | `/api/bookings/{id}` | Cancel a booking |  -  | `204 No Content` | `404`, `409` |
 
-### Request Body — `CreateHotelRequestDto` / `UpdateHotelCapacityRequestDto`
+### Request Body  -  `CreateHotelRequestDto` / `UpdateHotelCapacityRequestDto`
 
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | `capacity` | `Long` | `@NotNull @Positive` | Number of rooms in the hotel |
 
-### Request Body — `CreateBookingRequestDto`
+### Request Body  -  `CreateBookingRequestDto`
 
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
@@ -163,7 +163,7 @@ curl -X POST http://localhost:8080/api/bookings \
 }
 ```
 
-**Response `409 Conflict`** (pessimistic lock timeout — concurrent request):
+**Response `409 Conflict`** (pessimistic lock timeout  -  concurrent request):
 ```json
 {
   "message": "Resource is temporarily locked. Please retry."
@@ -176,7 +176,7 @@ curl -X POST http://localhost:8080/api/bookings \
 curl -X DELETE http://localhost:8080/api/bookings/17
 ```
 
-**Response `204 No Content`** — booking cancelled successfully.
+**Response `204 No Content`**  -  booking cancelled successfully.
 
 **Response `409 Conflict`** (already cancelled):
 ```json
@@ -290,15 +290,15 @@ Verify: `curl http://localhost:8080/actuator/health` → `{"status":"UP"}`
 ## 🛠️ Common Issues
 [Back to Table of Contents](#toc)
 
-1. **Application fails to start — DB connection refused** — PostgreSQL healthcheck must pass before the app starts. Check with `docker compose ps travel-agency-command-side-postgres` and `docker compose logs travel-agency-command-side-postgres`. The app container waits on the healthcheck condition defined in `docker-compose.yml`.
+1. **Application fails to start  -  DB connection refused**  -  PostgreSQL healthcheck must pass before the app starts. Check with `docker compose ps travel-agency-command-side-postgres` and `docker compose logs travel-agency-command-side-postgres`. The app container waits on the healthcheck condition defined in `docker-compose.yml`.
 
-2. **`OverbookingException` on every request** — the hotel's capacity in the DB may be 0 or the `daily_availabilities` table has stale data. Verify the `Hotel` record exists with `capacity > 0` and inspect the `daily_availabilities` rows for that hotel.
+2. **`OverbookingException` on every request**  -  the hotel's capacity in the DB may be 0 or the `daily_availabilities` table has stale data. Verify the `Hotel` record exists with `capacity > 0` and inspect the `daily_availabilities` rows for that hotel.
 
-3. **`409 — Resource is temporarily locked. Please retry.`** — a concurrent request is holding the pessimistic write lock on `daily_availabilities` for this hotel. The lock timeout is 3 seconds. Retry after a short delay; the other transaction will have committed or rolled back by then.
+3. **`409  -  Resource is temporarily locked. Please retry.`**  -  a concurrent request is holding the pessimistic write lock on `daily_availabilities` for this hotel. The lock timeout is 3 seconds. Retry after a short delay; the other transaction will have committed or rolled back by then.
 
-4. **Outbox messages stuck / not published** — check that Schema Registry is reachable at `http://schema-registry:8200`. Inspect `docker compose logs travel-agency-command-side` for Kafka producer errors. After `max-retries` (default 5) failures, messages are moved to the `dead_letter_outbox` table — query it directly to inspect the error messages.
+4. **Outbox messages stuck / not published**  -  check that Schema Registry is reachable at `http://schema-registry:8200`. Inspect `docker compose logs travel-agency-command-side` for Kafka producer errors. After `max-retries` (default 5) failures, messages are moved to the `dead_letter_outbox` table  -  query it directly to inspect the error messages.
 
-5. **Port conflict** — check for conflicts on `5432` (PostgreSQL), `8080` (app), `9092` (Kafka), `8200` (Schema Registry), `8100` (Kafka UI), `9090` (Prometheus), `3000` (Grafana), `3200` (Tempo): `netstat -ano | findstr :8080`.
+5. **Port conflict**  -  check for conflicts on `5432` (PostgreSQL), `8080` (app), `9092` (Kafka), `8200` (Schema Registry), `8100` (Kafka UI), `9090` (Prometheus), `3000` (Grafana), `3200` (Tempo): `netstat -ano | findstr :8080`.
 
 ---
 
@@ -336,16 +336,16 @@ graph LR
     end
 
     subgraph INFRASTRUCTURE["🔧 Infrastructure"]
-        subgraph TX["Decorators — Create"]
+        subgraph TX["Decorators  -  Create"]
             RU[RetryingCreateBookingUseCase\nmax 3 · 50 ms backoff]
             TXU[TransactionalCreateBookingUseCase\nREAD_COMMITTED]
         end
-        subgraph TXC["Decorators — Cancel"]
+        subgraph TXC["Decorators  -  Cancel"]
             RUC[RetryingCancelBookingUseCase\nmax 3 · 50 ms backoff]
             TXUC[TransactionalCancelBookingUseCase\nREAD_COMMITTED]
         end
         subgraph PERSISTENCE["Persistence"]
-            PA[TravelPersistenceAdapter\nreserveAvailability — SELECT FOR UPDATE\nreleaseAvailability]
+            PA[TravelPersistenceAdapter\nreserveAvailability  -  SELECT FOR UPDATE\nreleaseAvailability]
             JPA["JPA Repositories\nBooking · Hotel · Outbox\nDailyAvailability · DeadLetter"]
         end
         subgraph KAFKA["Kafka"]
@@ -387,7 +387,7 @@ graph LR
 - **CQRS Write Model:** This service handles only commands. All reads are delegated to a separate query-side service that consumes events from Kafka.
 - **Decorator Chain:** Both create and cancel flows follow the same pattern: `Controller` → `Retrying*UseCase` (Spring Retry, 3 attempts, 50 ms backoff on `DataIntegrityViolationException`) → `Transactional*UseCase` (`READ_COMMITTED`) → `BookingService`. All decorators are wired in `BeansConfiguration`.
 - **Pessimistic Locking on `daily_availabilities`:** Each row represents one hotel on one date. `reserveAvailability` issues `SELECT ... FOR UPDATE` on the affected rows with a 3 s lock timeout, preventing any concurrent transaction from double-booking the same day. New date slots are protected by a unique constraint `(hotel_id, date)` as an additional safety net for the first-booking race condition.
-- **Transactional Outbox Pattern:** `Booking` and `OutboxEntity` are persisted in one DB transaction — guarantees at-least-once Kafka delivery even if the broker is temporarily unavailable.
+- **Transactional Outbox Pattern:** `Booking` and `OutboxEntity` are persisted in one DB transaction  -  guarantees at-least-once Kafka delivery even if the broker is temporarily unavailable.
 - **Dead Letter Table:** Failed Kafka publishes are retried up to `max-retries` times; after that the record is moved to `dead_letter_outbox` for manual inspection and reprocessing.
 - **Schema Management via Liquibase:** All DDL is managed through versioned XML changelogs under `db/changelog/changes/`. Hibernate runs with `ddl-auto: none`.
 - **Virtual Threads + container-aware JVM:** `spring.threads.virtual.enabled=true` with `-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC`.
@@ -410,8 +410,8 @@ graph LR
 | Messaging | Apache Kafka (KRaft, no ZooKeeper)                                                    |
 | Schema | Apache Avro 1.12.0, Confluent Schema Registry 8.2.0                                   |
 | Serialisation | `kafka-avro-serializer`, `BookingEventAvro` + `EventType` enum generated from `.avsc` |
-| Scheduling | Spring `@Scheduled` + ShedLock (OutboxScheduler — fixed delay 1 s)                    |
-| Retry | Spring Retry (`RetryingCreateBookingUseCase` — 3 attempts, 50 ms backoff)             |
+| Scheduling | Spring `@Scheduled` + ShedLock (OutboxScheduler  -  fixed delay 1 s)                    |
+| Retry | Spring Retry (`RetryingCreateBookingUseCase`  -  3 attempts, 50 ms backoff)             |
 | Build | Maven 3.9, multi-stage Docker build                                                   |
 | Containerisation | Docker, Docker Compose v2+, non-root user, layer extraction                           |
 | API docs | SpringDoc OpenAPI 3.0.3, Swagger UI (disabled by default)                              |
@@ -424,7 +424,7 @@ graph LR
 ## 🧪 Testing Strategy
 [Back to Table of Contents](#toc)
 
-Unit tests — plain JUnit 5, no Spring context loaded.
+Unit tests  -  plain JUnit 5, no Spring context loaded.
 
 | Class | Key Scenarios |
 |-------|--------------|
@@ -445,8 +445,8 @@ Unit tests — plain JUnit 5, no Spring context loaded.
 | `TravelMapperTest` | Mapping between domain models and JPA entities |
 | `TransactionalCreateBookingUseCaseTest` | Transactional delegation to BookingService |
 | `TransactionalCancelBookingUseCaseTest` | Transactional delegation for cancellation |
-| `BookingControllerTest` | HTTP layer — 201, 204, 400, 409 responses |
-| `BookingControllerCancelTest` | DELETE endpoint — 204, 409 responses |
+| `BookingControllerTest` | HTTP layer  -  201, 204, 400, 409 responses |
+| `BookingControllerCancelTest` | DELETE endpoint  -  204, 409 responses |
 | `ErrorResponseDtoTest` | DTO construction |
 | `GlobalExceptionHandlerTest` | Exception → HTTP response mapping (including 409 for already cancelled) |
 
@@ -461,13 +461,13 @@ mvn verify      # unit tests + JaCoCo coverage report
 ## 📡 Observability
 [Back to Table of Contents](#toc)
 
-The stack ships with a full observability pipeline — metrics, traces, and pre-built dashboards — all included in the Docker Compose setup and ready out of the box.
+The stack ships with a full observability pipeline  -  metrics, traces, and pre-built dashboards  -  all included in the Docker Compose setup and ready out of the box.
 
 ### Stack
 
 | Component | Purpose | Default URL |
 |-----------|---------|-------------|
-| **Prometheus** | Metrics collection — scrapes `/actuator/prometheus` every 5 s | [http://localhost:9090](http://localhost:9090) |
+| **Prometheus** | Metrics collection  -  scrapes `/actuator/prometheus` every 5 s | [http://localhost:9090](http://localhost:9090) |
 | **Grafana** | Dashboards and visualization | [http://localhost:3000](http://localhost:3000) (admin / admin) |
 | **Tempo** | Distributed tracing backend (OTLP receiver) | [http://localhost:3200](http://localhost:3200) |
 
